@@ -1,8 +1,15 @@
 parameters:
+	
 	database:
+		
 		driver: mysql
+		
 		host: localhost
+		
 		database: fri_sandbox
+		
 		username: root
+		
 		password: 
+		
 		profiler: TRUE

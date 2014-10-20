@@ -3,6 +3,7 @@
 namespace App\Presenters;
 
 use Nette;
+use DibiConnection;
 
 
 /**
@@ -10,7 +11,19 @@ use Nette;
  */
 class SignPresenter extends BasePresenter
 {
+        /**
+	 * @var \DibiConnection
+	 */
+	private $database;
+        const TABLE = 'user';
 
+	/**
+	 * @param \DibiConnection
+	 */
+	public function __construct(DibiConnection $database)
+	{
+		$this->database = $database;
+	}
 
 	/**
 	 * Sign-in form factory.
@@ -19,15 +32,13 @@ class SignPresenter extends BasePresenter
 	protected function createComponentSignInForm()
 	{
 		$form = new Nette\Application\UI\Form;
-		$form->addText('username', 'Username:')
-			->setRequired('Please enter your username.');
+		$form->addText('email', 'Email:')
+			->setRequired('Please enter your email.');
 
-		$form->addPassword('password', 'Password:')
+		$form->addPassword('password', 'Heslo:')
 			->setRequired('Please enter your password.');
 
-		$form->addCheckbox('remember', 'Keep me signed in');
-
-		$form->addSubmit('send', 'Sign in');
+		$form->addSubmit('send', 'Prihlásiť');
 
 		// call method signInFormSucceeded() on success
 		$form->onSuccess[] = $this->signInFormSucceeded;
@@ -37,22 +48,19 @@ class SignPresenter extends BasePresenter
 
 	public function signInFormSucceeded($form)
 	{
-		$values = $form->getValues();
+            $values = $form->getValues();
+            
+            $query = $this->database->select('*')
+			->from(self::TABLE)
+			->where(self::TABLE . '.email = %s', $values->email)->fetch();                             
 
-		if ($values->remember) {
-			$this->getUser()->setExpiration('14 days', FALSE);
-		} else {
-			$this->getUser()->setExpiration('20 minutes', TRUE);
-		}
-
-		try {
-			$this->getUser()->login($values->username, $values->password);
-			$this->redirect('Homepage:');
-
-		} catch (Nette\Security\AuthenticationException $e) {
-			$form->addError($e->getMessage());
-		}
-	}
+            if($query->heslo == $values->password){  
+            $this->redirect('Homepage:');            
+            }
+            else{                
+                $form->addError('Neplatné heslo.');
+            }        
+        }
 
 
 	public function actionOut()
