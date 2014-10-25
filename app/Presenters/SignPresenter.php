@@ -44,7 +44,44 @@ class SignPresenter extends BasePresenter
 		$form->onSuccess[] = $this->signInFormSucceeded;
 		return $form;
 	}
+        
+        protected function createComponentRegForm()
+	{
+		$form = new Nette\Application\UI\Form;
+                $form->addText('meno', 'Meno:');
+                $form->addText('priezvisko', 'Priezvisko:');
+		$form->addText('email', 'Email:');
+                $form->addPassword('heslo', 'Heslo:')
+                     ->setRequired('Zvolte si heslo');
+                /*$form->addPassword('passwordVerify', 'Heslo pro kontrolu:')
+                     ->setRequired('Zadejte prosím heslo ještě jednou pro kontrolu');*/
+                $form->addText('vek', 'Vek:');
+		
+                //$form->addPassword('password2', 'Heslo znovu:');
+		$form->addSubmit('send', 'Registrovať');
 
+		// call method signInFormSucceeded() on success
+		$form->onSuccess[] = $this->regFormSucceeded;
+		return $form;
+	}
+        
+        protected function createComponentSignOutForm()
+	{
+		$this->redirect('Sign:in');
+	}
+	public function regFormSucceeded($form)
+        {
+            $values = $form->getValues();
+            $values['datum'] = date("Y-m-d H:i:s");
+        //if($values->password1 == $values->password2){
+            $this->database->insert(self::TABLE,$values)
+        ->execute(); 
+            $this->redirect('Sign:in');
+        /*}
+        else{
+            $this->flashMessage('Nezadali ste 2 krat to iste heslo.');            
+        }*/
+        }
 
 	public function signInFormSucceeded($form)
 	{
@@ -52,9 +89,14 @@ class SignPresenter extends BasePresenter
             
             $query = $this->database->select('*')
 			->from(self::TABLE)
-			->where(self::TABLE . '.email = %s', $values->email)->fetch();                             
-
-            if($query->heslo == $values->password){  
+			->where(self::TABLE . '.email = %s', $values->email)->fetch();      
+            $article['datum'] = date("Y-m-d H:i:s");
+            
+            if(isset($query->heslo) and $query->heslo == $values->password){
+            $_SESSION["id_user"] = $query->id;
+            $this->database->update(self::TABLE,$article)
+				->where(self::TABLE, '.email = %s', $query->email)
+				->execute();            
             $this->redirect('Homepage:');            
             }
             else{                
@@ -66,7 +108,7 @@ class SignPresenter extends BasePresenter
 	public function actionOut()
 	{
 		$this->getUser()->logout();
-		$this->flashMessage('You have been signed out.');
+		$this->flashMessage('Boli ste odhlaseny.');
 		$this->redirect('in');
 	}
 

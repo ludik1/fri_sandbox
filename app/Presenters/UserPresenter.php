@@ -13,7 +13,9 @@ class UserPresenter extends BasePresenter
 	private $database;
         const TABLE = 'user';
         const TABLE1 = 'usergroup';
-        const TABLE2 = 'group';
+        const TABLE2 = 'user_group';
+        
+        public $userModel;
 	/**
 	 * @param \DibiConnection
 	 */
@@ -26,11 +28,48 @@ class UserPresenter extends BasePresenter
 	 * Sign-in form factory.
 	 * @return Nette\Application\UI\Form
 	 */
-	protected function createComponentUserForm()
-	{
-		$this->userFormSucceeded;
-		return $form;
-	}
+        public function createComponentGrid($name) {             
+            $grid = new \Grido\Grid($this, $name);            
+            $grid->setModel($this->database->select('id, meno, priezvisko, email, vek, datum')->from(self::TABLE));
+            $grid->setPrimaryKey("id");
+            $grid->addColumnText('meno', 'Meno')
+            ->setSortable()
+            ->setFilterText()
+            ->setSuggestion();
+            $grid->addColumnText('priezvisko', 'Priezvisko')
+            ->setSortable()
+            ->setFilterText()
+            ->setSuggestion();
+            $grid->addColumnText('email', 'Email')
+            ->setSortable()
+            ->setFilterText()
+            ->setSuggestion();
+            $grid->addColumnText('datum', 'Datum')
+            ->setSortable()
+            ->setFilterDate();
+            $grid->addActionHref('delete', 'Delete')
+            ->setConfirm(function($item) {
+            return "Určite chcete zmazať používateľa {$item->meno} {$item->priezvisko}?";
+            });
+            return $grid;
+            }
+            public function actionDelete($id) {
+                $get_user = $_SESSION['id_user'];
+                $user =  $this->database->select('*')
+                        ->from(self::TABLE)
+                        ->where(self::TABLE . '.id = %i', $id)->fetch();
+                $this->database->delete(self::TABLE)
+                        ->where(self::TABLE . '.id = %i', $user->id)
+                        ->execute();
+                $this->database->delete(self::TABLE2)
+                        ->where(self::TABLE2 . '.iduser = %i', $user->id)
+                        ->execute();
+                $this->flashMessage('Užívateľ bol úspešne zmazaný.', 'success');
+                if ($get_user == $id) {
+                $this->redirect('Sign:out');
+                }
+                $this->redirect('list');
+            }
 
 
 }

@@ -1,9 +1,9 @@
+{block head}<link rel="stylesheet" href="https://rawgithub.com/o5/grido/master/client-side/grido.css">{/block}
 {block content}
+<a n:href="sign:in">Prihlasenie</a>
+<a n:href="sign:out">Odhlasenie</a>
 <a n:href="user:list">Administracia uzivatelov</a>
-<div id="banner">
+<a n:href="usergroup:list">Administracia skupin</a>
 	<h1 n:block=title>Vyhľadávanie</h1>
-{control homepageForm}
-
-{* or use {include '../components/form.latte', form => homepageForm} *}
-</div>
+{control grid}
 {/block}

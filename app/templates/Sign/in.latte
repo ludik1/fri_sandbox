@@ -1,6 +1,6 @@
 {block content}
-<h1 n:block=title>Prihlásenie</h1>
-
+<div class="prihlasenie">
+<h1 n:block=title><a n:href="Sign:reg">Registrácia</a>  Prihlásenie</h1>
 {control signInForm}
-
+</div>
 {* or use {include '../components/form.latte', form => signInForm} *}
