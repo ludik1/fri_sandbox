@@ -8,8 +8,41 @@ and open the template in the editor.
     Author     : Dudo
 */
 .prihlasenie{
-    text-align: center;
-    vertical-align:middle;
+    //text-align: center;
+    margin-left: 40%;
+    background-color: #9fc7f6;
+    width: 320px;
+    padding: 10px;
+    padding-top: 0;
+    border-radius: 5px;
+    margin-top: 200px;
+}
+a{
+    color: #008000;
+    text-decoration: none;
+}
+a:hover{
+    color: red;
 }
 
-
+.homepage{
+    background-color: #9fc7f6;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 20px;
+}
+.back{
+    font-weight: bold;
+    font-size: 20px;   
+}
+.reg{
+    text-align: center;
+    margin-left: 42%;
+    background-color: #9fc7f6;
+    width: 300px;
+    padding: 10px;
+    padding-top: 0;
+    border-radius: 5px;
+    margin-top: 200px;
+}
