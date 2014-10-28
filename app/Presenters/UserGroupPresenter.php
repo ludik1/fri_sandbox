@@ -29,7 +29,7 @@ class UserGroupPresenter extends BasePresenter
 	public function createComponentGrid($name) {
             $grid = new \Grido\Grid($this, $name);     
             $get_user = $_SESSION['id_user'];
-            $grid->setModel($this->database->select('id, nazov, popis,Count(user_group.idusergroup)as pocet,SUM(CASE iduser WHEN ' . $get_user . ' THEN 1 ELSE 0 END) as pridaj ')->from(self::TABLE1)->join(self::TABLE2)->on(self::TABLE1 . '.id = ' . self::TABLE2 . '.idusergroup')->groupBy('id,nazov'));
+            $grid->setModel($this->database->select('id, nazov, popis,Count(user_group.idusergroup)as pocet,SUM(CASE iduser WHEN ' . $get_user . ' THEN 1 ELSE 0 END) as pridaj ')->from(self::TABLE1)->leftJoin(self::TABLE2)->on(self::TABLE1 . '.id = ' . self::TABLE2 . '.idusergroup')->groupBy('id'));
             $grid->setPrimaryKey("id");
             $grid->addColumnText('nazov', 'Nazov')
             ->setSortable()
@@ -117,5 +117,21 @@ class UserGroupPresenter extends BasePresenter
              $this->redirect('UserGroup:list');
              
          }
+         protected function createComponentUsergroupregForm()
+	{
+		$form = new Nette\Application\UI\Form;
+                $form->addText('nazov', 'Nazov:');
+                $form->addTextArea('popis', 'Popis:');
+		$form->addSubmit('save', 'Uložiť');
 
+		// call method signInFormSucceeded() on success
+		$form->onSuccess[] = $this->usergroupregFormSucceeded;
+		return $form;
+	}
+         public function usergroupregFormSucceeded($form){
+             $values = $form->getValues();
+             $this->database->insert(self::TABLE1,$values)->execute();
+             $this->redirect('UserGroup:list');
+             
+         }
 }

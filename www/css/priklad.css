@@ -36,6 +36,11 @@ a:hover{
     font-weight: bold;
     font-size: 20px;   
 }
+.back1{
+    font-weight: bold;
+    font-size: 20px;   
+    float: right;
+}
 .reg{
     text-align: center;
     margin-left: 42%;
